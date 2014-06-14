@@ -1,113 +1,113 @@
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="https://cdn.firebase.com/js/client/1.0.15/firebase.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.17/angular.min.js"></script>
-    <script src="https://cdn.firebase.com/libs/angularfire/0.7.1/angularfire.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="https://cdn.firebase.com/js/client/1.0.15/firebase.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.17/angular.min.js"></script>
+  <script src="https://cdn.firebase.com/libs/angularfire/0.7.1/angularfire.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 
 
-    <script type="text/javascript">
-        angular.module('chat', ['firebase']).controller('Chat', ['$scope', '$firebase',
-            function($scope, $firebase) {
-                var ref = new Firebase("https://fiery-fire-4044.firebaseio.com");
-                $scope.turns = $firebase(ref.limit(15));
-                $scope.username = 'Guest ' + Math.floor(Math.random()*101);
-                $scope.addPhrase = function() {
-                    console.log($scope.phrase);
-                    $scope.turns.$add({
-                        from: $scope.username,
-                        type: 'phrase',
-                        content: $scope.phrase
-                    });
-                    $scope.phrase = "";
-                }
+  <script type="text/javascript">
+    angular.module('chat', ['firebase']).controller('Chat', ['$scope', '$firebase',
+      function ($scope, $firebase) {
+        var ref = new Firebase("https://fiery-fire-4044.firebaseio.com");
+        $scope.turns = $firebase(ref.limit(15));
+        $scope.username = 'Guest ' + Math.floor(Math.random() * 101);
+        $scope.addPhrase = function () {
+          console.log($scope.phrase);
+          $scope.turns.$add({
+            from: $scope.username,
+            type: 'phrase',
+            content: $scope.phrase
+          });
+          $scope.phrase = "";
+        }
 
-                $scope.addDrawing = function() {
-                    $scope.turns.$add({
-                        from: $scope.username,
-                        type: 'drawing',
-                        content: $('#drawing-canvas')[0].toDataURL()
-                    });
+        $scope.addDrawing = function () {
+          $scope.turns.$add({
+            from: $scope.username,
+            type: 'drawing',
+            content: $('#drawing-canvas')[0].toDataURL()
+          });
 
-                    var context = $('#drawing-canvas')[0].getContext("2d");
-                    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-                }
-            }
-        ]);
-    </script>
+          var context = $('#drawing-canvas')[0].getContext("2d");
+          context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        }
+      }
+    ]);
+  </script>
 
-    <script type="text/javascript">
-        $(document).ready( function() {
-            var clickX = new Array();
-            var clickY = new Array();
-            var clickDrag = new Array();
-            var clickColor = new Array();
-            var paint = false;
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var clickX = new Array();
+      var clickY = new Array();
+      var clickDrag = new Array();
+      var clickColor = new Array();
+      var paint = false;
 
-            var colors = {
-                purple: "#cb3594",
-                green: "#659b41",
-                yellow: "#ffcf33",
-                brown: "#986928",
-                red: "#df4b26"
-            };
+      var colors = {
+        purple: "#cb3594",
+        green: "#659b41",
+        yellow: "#ffcf33",
+        brown: "#986928",
+        red: "#df4b26"
+      };
 
-            var curColor = colors.purple;
+      var curColor = colors.purple;
 
-            function addClick(x, y, dragging) {
-                clickX.push(x);
-                clickY.push(y);
-                clickDrag.push(dragging);
-                clickColor.push(curColor);
-            }
+      function addClick(x, y, dragging) {
+        clickX.push(x);
+        clickY.push(y);
+        clickDrag.push(dragging);
+        clickColor.push(curColor);
+      }
 
-            function redraw() {
-                var context = $("#drawing-canvas")[0].getContext("2d");
-                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-                context.lineJoin = "round";
-                context.lineWidth = "5";
+      function redraw() {
+        var context = $("#drawing-canvas")[0].getContext("2d");
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        context.lineJoin = "round";
+        context.lineWidth = "5";
 
-                for (var i = 0; i < clickX.length; i++) {
-                    context.beginPath();
-                    if (clickDrag[i] && i) {
-                        context.moveTo(clickX[i-1], clickY[i-1]);
-                    } else {
-                        context.moveTo(clickX[i]-1, clickY[i]);
-                    }
-                    context.lineTo(clickX[i], clickY[i]);
-                    context.closePath();
-                    context.strokeStyle = clickColor[i];
-                    context.stroke();
-                }
-            }
+        for (var i = 0; i < clickX.length; i++) {
+          context.beginPath();
+          if (clickDrag[i] && i) {
+            context.moveTo(clickX[i - 1], clickY[i - 1]);
+          } else {
+            context.moveTo(clickX[i] - 1, clickY[i]);
+          }
+          context.lineTo(clickX[i], clickY[i]);
+          context.closePath();
+          context.strokeStyle = clickColor[i];
+          context.stroke();
+        }
+      }
 
-            $(".canvas-color").click(function(e) {
-                var newColor = e.target.value;
-                curColor = colors[newColor];
-            });
+      $(".canvas-color").click(function (e) {
+        var newColor = e.target.value;
+        curColor = colors[newColor];
+      });
 
-            $('#drawing-canvas').mousedown(function(e) {
-                var mouseX = e.pageX - this.offsetLeft;
-                var mouseY = e.pageY - this.offsetTop;
-                paint = true;
-                addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
-                redraw();
-            });
-            $('#drawing-canvas').mousemove(function(e) {
-                if (paint) {
-                    addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
-                    redraw();
-                }
-            });
-            $('#drawing-canvas').mouseup(function(e) {
-                paint = false;
-            });
-            $('#drawing-canvas').mouseleave(function(e) {
-                paint = false
-            });
-        });
-    </script>
+      $('#drawing-canvas').mousedown(function (e) {
+        var mouseX = e.pageX - this.offsetLeft;
+        var mouseY = e.pageY - this.offsetTop;
+        paint = true;
+        addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+        redraw();
+      });
+      $('#drawing-canvas').mousemove(function (e) {
+        if (paint) {
+          addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+          redraw();
+        }
+      });
+      $('#drawing-canvas').mouseup(function (e) {
+        paint = false;
+      });
+      $('#drawing-canvas').mouseleave(function (e) {
+        paint = false
+      });
+    });
+  </script>
 </head>
 <body>
 
@@ -124,36 +124,37 @@
 <hr>
 
 <div ng-app="chat" ng-controller="Chat">
-    <form class="form-inline">
-        Your name: <input type="text" ng-model="username">
-    </form>
-    <div ng-cloak ng-repeat="turn in turns">
-        <em>{{turn.from}}: </em> <br />
-        <div ng-if="turn.type == 'drawing'">
-            <img src="{{ turn.content }}" />
-        </div>
-        <div ng-if="turn.type != 'drawing'">{{ turn.content }}</div>
+  <form class="form-inline">
+    Your name: <input type="text" ng-model="username">
+  </form>
+  <div ng-cloak ng-repeat="turn in turns">
+    <em>{{turn.from}}: </em> <br/>
+
+    <div ng-if="turn.type == 'drawing'">
+      <img src="{{ turn.content }}"/>
     </div>
+    <div ng-if="turn.type != 'drawing'">{{ turn.content }}</div>
+  </div>
 
-    <form class="form-inline" ng-submit="addPhrase()">
-        <input type="text" ng-model="phrase" placeholder="Phrase...">
-        <button class="btn" type="submit">
-            <i class="icon-reply">Done!</i>
-        </button>
-    </form>
+  <form class="form-inline" ng-submit="addPhrase()">
+    <input type="text" ng-model="phrase" placeholder="Phrase...">
+    <button class="btn" type="submit">
+      <i class="icon-reply">Done!</i>
+    </button>
+  </form>
 
-    <form class="form-inline" ng-submit="addDrawing()">
-        <canvas id="drawing-canvas" width="490" height="220" ng-model="drawing"></canvas>
-        <br />
-        <button class="canvas-color btn" type="button" value="red">Red</button>
-        <button class="canvas-color btn" type="button" value="green">Green</button>
-        <button class="canvas-color btn" type="button" value="yellow">Yellow</button>
-        <button class="canvas-color btn" type="button" value="purple">Purple</button>
-        <button class="canvas-color btn" type="button" value="brown">Brown</button>
-        <button class="btn" type="submit">
-            <i class="icon-reply">Done!</i>
-        </button>
-    </form>
+  <form class="form-inline" ng-submit="addDrawing()">
+    <canvas id="drawing-canvas" width="490" height="220" ng-model="drawing"></canvas>
+    <br/>
+    <button class="canvas-color btn" type="button" value="red">Red</button>
+    <button class="canvas-color btn" type="button" value="green">Green</button>
+    <button class="canvas-color btn" type="button" value="yellow">Yellow</button>
+    <button class="canvas-color btn" type="button" value="purple">Purple</button>
+    <button class="canvas-color btn" type="button" value="brown">Brown</button>
+    <button class="btn" type="submit">
+      <i class="icon-reply">Done!</i>
+    </button>
+  </form>
 </div>
 
 </body>
