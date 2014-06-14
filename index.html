@@ -17,13 +17,21 @@
                     console.log($scope.phrase);
                     $scope.turns.$add({
                         from: $scope.username,
+                        type: 'phrase',
                         content: $scope.phrase
                     });
-                    $scope.turn = "";
+                    $scope.phrase = "";
                 }
 
                 $scope.addDrawing = function() {
-                    console.log($scope.drawing);
+                    $scope.turns.$add({
+                        from: $scope.username,
+                        type: 'drawing',
+                        content: $('#drawing-canvas')[0].toDataURL()
+                    });
+
+                    var context = $('#drawing-canvas')[0].getContext("2d");
+                    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
                 }
             }
         ]);
@@ -121,7 +129,10 @@
     </form>
     <div ng-cloak ng-repeat="turn in turns">
         <em>{{turn.from}}: </em> <br />
-        {{turn.content}}
+        <div ng-if="turn.type == 'drawing'">
+            <img src="{{ turn.content }}" />
+        </div>
+        <div ng-if="turn.type != 'drawing'">{{ turn.content }}</div>
     </div>
 
     <form class="form-inline" ng-submit="addPhrase()">
