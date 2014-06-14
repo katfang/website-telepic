@@ -4,38 +4,8 @@
   <script src="https://cdn.firebase.com/js/client/1.0.15/firebase.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.17/angular.min.js"></script>
   <script src="https://cdn.firebase.com/libs/angularfire/0.7.1/angularfire.min.js"></script>
-  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-
-
-  <script type="text/javascript">
-    angular.module('chat', ['firebase']).controller('Chat', ['$scope', '$firebase',
-      function ($scope, $firebase) {
-        var ref = new Firebase("https://fiery-fire-4044.firebaseio.com");
-        $scope.turns = $firebase(ref.limit(15));
-        $scope.username = 'Guest ' + Math.floor(Math.random() * 101);
-        $scope.addPhrase = function () {
-          console.log($scope.phrase);
-          $scope.turns.$add({
-            from: $scope.username,
-            type: 'phrase',
-            content: $scope.phrase
-          });
-          $scope.phrase = "";
-        }
-
-        $scope.addDrawing = function () {
-          $scope.turns.$add({
-            from: $scope.username,
-            type: 'drawing',
-            content: $('#drawing-canvas')[0].toDataURL()
-          });
-
-          var context = $('#drawing-canvas')[0].getContext("2d");
-          context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        }
-      }
-    ]);
-  </script>
+  <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="app.js"></script>
 
   <script type="text/javascript">
     $(document).ready(function () {
@@ -83,27 +53,32 @@
       }
 
       $(".canvas-color").click(function (e) {
+        console.log("a");
         var newColor = e.target.value;
         curColor = colors[newColor];
       });
 
-      $('#drawing-canvas').mousedown(function (e) {
+      $('.drawing-canvas').mousedown(function (e) {
+        console.log("a");
         var mouseX = e.pageX - this.offsetLeft;
         var mouseY = e.pageY - this.offsetTop;
         paint = true;
         addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
         redraw();
       });
-      $('#drawing-canvas').mousemove(function (e) {
+      $('.drawing-canvas').mousemove(function (e) {
+        console.log("b");
         if (paint) {
           addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
           redraw();
         }
       });
-      $('#drawing-canvas').mouseup(function (e) {
+      $('.drawing-canvas').mouseup(function (e) {
+        console.log("c");
         paint = false;
       });
-      $('#drawing-canvas').mouseleave(function (e) {
+      $('.drawing-canvas').mouseleave(function (e) {
+        console.log("d");
         paint = false
       });
     });
@@ -123,7 +98,7 @@
 
 <hr>
 
-<div ng-app="chat" ng-controller="Chat">
+<div ng-app="telepic" ng-controller="GameCtrl">
   <form class="form-inline">
     Your name: <input type="text" ng-model="username">
   </form>
@@ -131,9 +106,9 @@
     <em>{{turn.from}}: </em> <br/>
 
     <div ng-if="turn.type == 'drawing'">
-      <img src="{{ turn.content }}"/>
+      <img ng-src="{{turn.content}}"/>
     </div>
-    <div ng-if="turn.type != 'drawing'">{{ turn.content }}</div>
+    <div ng-if="turn.type != 'drawing'">{{turn.content}}</div>
   </div>
 
   <form class="form-inline" ng-submit="addPhrase()">
@@ -144,17 +119,11 @@
   </form>
 
   <form class="form-inline" ng-submit="addDrawing()">
-    <canvas id="drawing-canvas" width="490" height="220" ng-model="drawing"></canvas>
-    <br/>
-    <button class="canvas-color btn" type="button" value="red">Red</button>
-    <button class="canvas-color btn" type="button" value="green">Green</button>
-    <button class="canvas-color btn" type="button" value="yellow">Yellow</button>
-    <button class="canvas-color btn" type="button" value="purple">Purple</button>
-    <button class="canvas-color btn" type="button" value="brown">Brown</button>
-    <button class="btn" type="submit">
-      <i class="icon-reply">Done!</i>
-    </button>
   </form>
+
+  <test>
+    <test-color name="Red"></test-color>
+  </test>  
 </div>
 
 </body>
